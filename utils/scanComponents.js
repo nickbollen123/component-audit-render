@@ -23,7 +23,7 @@ async function renderScreenshot(componentName, id) {
   const page = await browser.newPage();
   const html = `<html><body><${componentName}>Example</${componentName}></body></html>`;
   await page.setContent(html, { waitUntil: 'load' });
-  const screenshotPath = \`/tmp/\${id}.png\`;
+  const screenshotPath = `/tmp/${id}.png`;
   await page.screenshot({ path: screenshotPath });
   await browser.close();
   const data = await fs.readFile(screenshotPath);
