@@ -19,28 +19,35 @@ function guessType(name = '') {
 }
 
 async function renderScreenshot(componentName, id) {
+  console.log(`Rendering screenshot for component: ${componentName}`);
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  const html = `<html><body><\${componentName}>Example</\${componentName}></body></html>`;
+  const html = `<html><body><${componentName}>Example</${componentName}></body></html>`;
   await page.setContent(html, { waitUntil: 'load' });
-  const screenshotPath = `/tmp/\${id}.png`;
+  const screenshotPath = `/tmp/${id}.png`;
   await page.screenshot({ path: screenshotPath });
   await browser.close();
   const data = await fs.readFile(screenshotPath);
-  return `data:image/png;base64,\${data.toString('base64')}`;
+  return `data:image/png;base64,${data.toString('base64')}`;
 }
 
 async function scanComponents(rootDir) {
+  console.log("📂 Scanning root directory:", rootDir);
   const files = await globby(['**/*.{js,jsx,ts,tsx}'], { cwd: rootDir, absolute: true });
+  console.log(`🔍 Found ${files.length} potential component files`);
+
   const components = [];
   const seenHashes = new Map();
 
   for (const file of files) {
     try {
       const code = await fs.readFile(file, 'utf8');
-      const parsed = reactDocgen.parse(code);
-      const hash = hashComponent(JSON.stringify(parsed.props || {}));
+      console.log(`📄 Reading and parsing: ${file}`);
 
+      const parsed = reactDocgen.parse(code);
+      console.log(`✅ Parsed component: ${parsed.displayName || path.basename(file)}`);
+
+      const hash = hashComponent(JSON.stringify(parsed.props || {}));
       const componentName = parsed.displayName || path.basename(file);
       const screenshot = await renderScreenshot(componentName, hash);
 
@@ -55,11 +62,12 @@ async function scanComponents(rootDir) {
 
       seenHashes.set(hash, true);
       components.push(component);
-    } catch {
-      // skip unparseable
+    } catch (err) {
+      console.log(`❌ Failed to parse ${file}: ${err.message}`);
     }
   }
 
+  console.log(`✅ Finished scanning. Total components found: ${components.length}`);
   return components;
 }
 
