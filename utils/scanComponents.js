@@ -21,13 +21,13 @@ function guessType(name = '') {
 async function renderScreenshot(componentName, id) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  const html = `<html><body><${componentName}>Example</${componentName}></body></html>`;
+  const html = `<html><body><\${componentName}>Example</\${componentName}></body></html>`;
   await page.setContent(html, { waitUntil: 'load' });
-  const screenshotPath = `/tmp/${id}.png`;
+  const screenshotPath = `/tmp/\${id}.png`;
   await page.screenshot({ path: screenshotPath });
   await browser.close();
   const data = await fs.readFile(screenshotPath);
-  return \`data:image/png;base64,\${data.toString('base64')}\`;
+  return `data:image/png;base64,\${data.toString('base64')}`;
 }
 
 async function scanComponents(rootDir) {
