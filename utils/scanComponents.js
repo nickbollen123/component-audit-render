@@ -1,4 +1,4 @@
-const globby = require('globby');
+const globby = require('globby').globby;
 const fs = require('fs-extra');
 const path = require('path');
 const reactDocgen = require('react-docgen');
