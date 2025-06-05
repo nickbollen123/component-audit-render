@@ -21,7 +21,7 @@ function guessType(name = '') {
 async function renderScreenshot(componentName, id) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  const html = \`<html><body><\${componentName}>Example</\${componentName}></body></html>\`;
+  const html = `<html><body><${componentName}>Example</${componentName}></body></html>`;
   await page.setContent(html, { waitUntil: 'load' });
   const screenshotPath = \`/tmp/\${id}.png\`;
   await page.screenshot({ path: screenshotPath });
